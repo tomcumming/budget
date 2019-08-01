@@ -3,12 +3,17 @@
     <head>
         <meta charset="utf8">
         <title>Budget Helper</title>
+        <script>
+window.addEventListener(
+    'load',
+    () => { navigator.serviceWorker.register('./service-worker.js'); });
+        </script>
     </head>
     <body>
         <div id="wrapper">
 
         </div>
-        <script src="./index.tsx">
+        <script src="./bundle.js">
         </script>
     </body>
 </html>
