@@ -1,8 +1,11 @@
 {
     "compilerOptions": {
         "strict": true,
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
         "jsx": "react",
-        "jsxFactory": "preact.h"
+        "jsxFactory": "preact.h",
     },
     "files": [
         "./src/index.tsx"

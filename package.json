@@ -1,7 +1,8 @@
 {
   "scripts": {
     "start": "parcel serve src/index.html",
-    "build": "parcel build src/index.html"
+    "build": "parcel build src/index.html",
+    "check": "tsc --noEmit"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.3",
