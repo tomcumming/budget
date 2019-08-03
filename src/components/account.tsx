@@ -3,6 +3,7 @@ import { Account } from './app';
 
 export type Props = {
     initialAccount?: Account;
+    isInUse: boolean;
     onSave: (account: Account) => void;
     onDelete: () => void;
 };
@@ -78,6 +79,15 @@ export default class AccountEdit extends preact.Component<Props, State> {
                         />
                     </label>
                 </fieldset>
+                {this.props.isInUse ? (
+                    <h1>
+                        <span class='label warning'>
+                            Can't delete; Used by a Budget
+                        </span>
+                    </h1>
+                ) : (
+                    undefined
+                )}
                 <div class='flex two'>
                     <button
                         className='success'
@@ -86,7 +96,11 @@ export default class AccountEdit extends preact.Component<Props, State> {
                     >
                         Save
                     </button>
-                    <button className='error' onClick={this.props.onDelete}>
+                    <button
+                        className='error'
+                        onClick={this.props.onDelete}
+                        disabled={this.props.isInUse}
+                    >
                         Delete
                     </button>
                 </div>

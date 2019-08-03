@@ -202,13 +202,17 @@ export default class App extends preact.Component<Props, State> {
                 />
             );
         else if (this.state.screen.type === 'edit-account') {
+            const accountId = this.state.screen.id;
+            const inUse =
+                Object.values(this.state.storedState.budgets).filter(b =>
+                    b.accounts.some(aId => aId === accountId)
+                ).length > 0;
             screen = (
                 <AccountEdit
-                    initialAccount={
-                        this.state.storedState.accounts[this.state.screen.id]
-                    }
+                    initialAccount={this.state.storedState.accounts[accountId]}
                     onSave={this.onSaveAccount}
                     onDelete={this.onDeleteAccount}
+                    isInUse={inUse}
                 />
             );
         } else if (this.state.screen.type === 'view-budgets') {
