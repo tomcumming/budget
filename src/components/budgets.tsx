@@ -67,7 +67,7 @@ function BudgetInfo({
         (dayMs + lastDate.getTime() - firstDate.getTime()) / dayMs
     );
     const currentDays =
-        Math.round((firstDate.getTime() - startOfToday.getTime()) / dayMs) + 1;
+        Math.round((startOfToday.getTime() - firstDate.getTime()) / dayMs) + 1;
     const daysLeft = lengthDays - currentDays;
 
     const totalBudget = budget.startingBalance - budget.targetBalance;
@@ -120,7 +120,7 @@ function BudgetInfo({
                         </td>
                     </tr>
                     <tr>
-                        <td>Balance</td>
+                        <td>Remaining</td>
                         <td>
                             <strong className={numberStyleClass}>
                                 {currentTotal}
