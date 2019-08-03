@@ -1,5 +1,21 @@
 import * as preact from 'preact';
 import { Account, Budget } from './app';
+import { startOfDay } from '../date';
+
+function jsonDateAsInputValue(jsonDate: string) {
+    if (jsonDate === '') return '';
+    else {
+        const date = new Date(jsonDate);
+
+        const pad2 = (n: number) => n.toString().padStart(2, '0');
+
+        return [
+            date.getFullYear(),
+            pad2(date.getMonth() + 1),
+            pad2(date.getDate())
+        ].join('-');
+    }
+}
 
 export type Props = {
     initialBudget?: Budget;
@@ -28,7 +44,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
         this.state = {
             budget:
                 props.initialBudget === undefined
-                    ? emptyBudget(new Date())
+                    ? emptyBudget(startOfDay(new Date()))
                     : props.initialBudget
         };
     }
@@ -58,24 +74,48 @@ export default class BudgetEdit extends preact.Component<Props, State> {
         const budget: Budget = {
             ...this.state.budget,
             startingBalance: this.startingBalance(),
+            firstDay: new Date(this.state.budget.firstDay).toJSON(),
             lastDay: new Date(this.state.budget.lastDay).toJSON()
         };
-        debugger;
         this.props.onSave(budget);
     };
+
+    validationMessages(): string[] {
+        const state = this.state.budget;
+
+        let errors = [];
+
+        if (state.name.length === 0) errors.push('No name set');
+        if (state.accounts.length === 0) errors.push('No accounts selected');
+        if (state.firstDay === '') errors.push('No first day set');
+        if (state.lastDay === '') errors.push('No last day set');
+        if (
+            state.firstDay !== '' &&
+            state.lastDay !== '' &&
+            new Date(state.firstDay).getTime() >
+                new Date(state.lastDay).getTime()
+        )
+            errors.push('Last day must be after first day');
+        if (!Number.isFinite(state.targetBalance))
+            errors.push('Enter a target balance');
+
+        return errors;
+    }
 
     componentDidUpdate(prevProps: Props) {
         if (this.props.initialBudget !== prevProps.initialBudget) {
             this.setState({
                 budget:
                     this.props.initialBudget === undefined
-                        ? emptyBudget(new Date())
+                        ? emptyBudget(startOfDay(new Date()))
                         : this.props.initialBudget
             });
         }
     }
 
     render() {
+        const errors = this.validationMessages();
+
         return (
             <div className='edit-budget'>
                 <h1>Edit Budget</h1>
@@ -144,9 +184,11 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                 <div class='flex one'>
                     <span>
                         <strong>First day:</strong>{' '}
-                        {new Date(
-                            this.state.budget.firstDay
-                        ).toLocaleDateString()}
+                        <span>
+                            {new Date(
+                                this.state.budget.firstDay
+                            ).toLocaleDateString()}
+                        </span>
                     </span>
                 </div>
                 <fieldset class='flex one'>
@@ -157,7 +199,9 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                         <input
                             type='date'
                             placeholder='Last Day'
-                            value={this.state.budget.lastDay}
+                            value={jsonDateAsInputValue(
+                                this.state.budget.lastDay
+                            )}
                             onInput={e =>
                                 this.setState({
                                     budget: {
@@ -170,8 +214,21 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                         />
                     </label>
                 </fieldset>
+                {errors.length > 0 ? (
+                    <ul>
+                        {errors.map(error => (
+                            <li key={error}>{error}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    undefined
+                )}
                 <div class='flex two'>
-                    <button className='success' onClick={this.onClickSave}>
+                    <button
+                        className='success'
+                        onClick={this.onClickSave}
+                        disabled={errors.length > 0}
+                    >
                         Save
                     </button>
                     <button className='error' onClick={this.props.onDelete}>

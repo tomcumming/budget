@@ -35,6 +35,8 @@ export default class AccountEdit extends preact.Component<Props, State> {
     }
 
     render() {
+        const invalidBalance = !Number.isFinite(this.state.account.balance);
+
         return (
             <div className='edit-account'>
                 <h1>Edit Account</h1>
@@ -80,6 +82,7 @@ export default class AccountEdit extends preact.Component<Props, State> {
                     <button
                         className='success'
                         onClick={() => this.props.onSave(this.state.account)}
+                        disabled={invalidBalance}
                     >
                         Save
                     </button>

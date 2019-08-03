@@ -29,12 +29,7 @@ export type StoredState = {
 
 const initialStoredState: StoredState = {
     freshId: 1,
-    accounts: {
-        1: {
-            name: 'test account',
-            balance: 123
-        }
-    },
+    accounts: {},
     budgets: {}
 };
 
@@ -221,6 +216,9 @@ export default class App extends preact.Component<Props, State> {
                 <Budgets
                     budgets={this.state.storedState.budgets}
                     onAdd={this.onAddBudget}
+                    hasAccounts={
+                        Object.keys(this.state.storedState.accounts).length > 0
+                    }
                 />
             );
         } else if (this.state.screen.type === 'edit-budget') {
@@ -253,14 +251,14 @@ function Header(_props: {}) {
     return (
         <nav className='header'>
             <div className='menu'>
-                <a href='#budgets'>
+                <a href='#budgets' className='button'>
                     <span>Budgets</span>
                 </a>
-                <a href='#accounts'>
+                <a href='#accounts' className='button'>
                     <span>Accounts</span>
                 </a>
-                <a href='#settings'>
-                    <span>Settings</span>
+                <a href='#settings' className='button'>
+                    <span>⚙</span>
                 </a>
             </div>
         </nav>
