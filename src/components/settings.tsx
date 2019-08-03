@@ -29,6 +29,7 @@ export default class Settings extends preact.Component<Props, State> {
             fileReader.onload = e => {
                 const json = (e.target as any).result;
                 const storedState: StoredState = JSON.parse(json);
+                input.value = '';
                 this.props.setStoredState(storedState);
             };
             fileReader.readAsText(file);
@@ -36,7 +37,8 @@ export default class Settings extends preact.Component<Props, State> {
     };
 
     onDelete = () => {
-        this.props.setStoredState(initialStoredState);
+        if (confirm('Are you sure'))
+            this.props.setStoredState(initialStoredState);
     };
 
     render() {
