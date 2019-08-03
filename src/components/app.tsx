@@ -4,6 +4,7 @@ import Accounts from './accounts';
 import AccountEdit from './account';
 import Budgets from './budgets';
 import EditBudget from './budget';
+import Settings from './settings';
 
 const localStorageKey = 'app-state';
 
@@ -27,7 +28,7 @@ export type StoredState = {
     budgets: { [id: number]: Budget };
 };
 
-const initialStoredState: StoredState = {
+export const initialStoredState: StoredState = {
     freshId: 1,
     accounts: {},
     budgets: {}
@@ -39,7 +40,8 @@ type Screen =
     | { type: 'view-budgets' }
     | { type: 'edit-budget'; id: number }
     | { type: 'view-accounts' }
-    | { type: 'edit-account'; id: number };
+    | { type: 'edit-account'; id: number }
+    | { type: 'settings' };
 
 type State = {
     storedState: StoredState;
@@ -86,6 +88,12 @@ export default class App extends preact.Component<Props, State> {
                 screen: {
                     type: 'edit-account',
                     id: parseInt(match[1])
+                }
+            });
+        } else if (/^#settings$/.test(hash)) {
+            this.setState({
+                screen: {
+                    type: 'settings'
                 }
             });
         } else {
@@ -183,6 +191,12 @@ export default class App extends preact.Component<Props, State> {
         window.location.hash = `#budget/${id}`;
     };
 
+    onImportStoredState = (storedState: StoredState) => {
+        updateStoredState(storedState);
+        this.setState({ storedState });
+        window.location.hash = `#accounts`;
+    };
+
     componentDidMount() {
         window.addEventListener('hashchange', this.handleRouteChange);
         this.handleRouteChange(undefined as any);
@@ -232,6 +246,13 @@ export default class App extends preact.Component<Props, State> {
                     accounts={this.state.storedState.accounts}
                     onSave={this.onSaveBudget}
                     onDelete={this.onDeleteBudget}
+                />
+            );
+        } else if (this.state.screen.type === 'settings') {
+            screen = (
+                <Settings
+                    storedState={this.state.storedState}
+                    setStoredState={this.onImportStoredState}
                 />
             );
         }

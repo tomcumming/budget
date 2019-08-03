@@ -58,22 +58,20 @@ export default class BudgetEdit extends preact.Component<Props, State> {
         this.setState({
             budget: {
                 ...this.state.budget,
-                accounts
+                accounts,
+                startingBalance: accounts.reduce(
+                    (p, c) => p + this.props.accounts[c].balance,
+                    0
+                )
             }
         });
     };
 
-    startingBalance(): number {
-        return this.state.budget.accounts.reduce(
-            (p, c) => p + this.props.accounts[c].balance,
-            0
-        );
-    }
-
     onClickSave = () => {
         const budget: Budget = {
             ...this.state.budget,
-            startingBalance: this.startingBalance(),
+            startingBalance: this.state.budget.startingBalance,
+            // These should be start of day anyway
             firstDay: new Date(this.state.budget.firstDay).toJSON(),
             lastDay: new Date(this.state.budget.lastDay).toJSON()
         };
@@ -121,6 +119,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                 <h1>Edit Budget</h1>
                 <fieldset class='flex one'>
                     <label>
+                        <span>Name</span>
                         <input
                             type='text'
                             placeholder='Name'
@@ -139,7 +138,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                 </fieldset>
                 <h2>Accounts</h2>
                 {Object.entries(this.props.accounts).map(([id, account]) => (
-                    <div className='flex one'>
+                    <div className='flex one' key={id}>
                         <label>
                             <input
                                 type='checkbox'
@@ -152,12 +151,29 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                         </label>
                     </div>
                 ))}
-                <div class='flex one'>
-                    <span>
-                        <strong>Starting Balance:</strong>{' '}
-                        {this.startingBalance().toFixed(2)}
-                    </span>
-                </div>
+                <fieldset class='flex one'>
+                    <label>
+                        <strong>
+                            <span>Starting Balance:</span>
+                        </strong>
+                        <input
+                            type='number'
+                            placeholder='Target Balance'
+                            value={this.state.budget.startingBalance}
+                            onInput={e =>
+                                this.setState({
+                                    budget: {
+                                        ...this.state.budget,
+                                        startingBalance: parseFloat(
+                                            (e.currentTarget as HTMLInputElement)
+                                                .value
+                                        )
+                                    }
+                                })
+                            }
+                        />
+                    </label>
+                </fieldset>
                 <fieldset class='flex one'>
                     <label>
                         <strong>
@@ -181,16 +197,29 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                         />
                     </label>
                 </fieldset>
-                <div class='flex one'>
-                    <span>
-                        <strong>First day:</strong>{' '}
-                        <span>
-                            {new Date(
+                <fieldset class='flex one'>
+                    <label>
+                        <strong>
+                            <span>First Day:</span>
+                        </strong>
+                        <input
+                            type='date'
+                            placeholder='First Day'
+                            value={jsonDateAsInputValue(
                                 this.state.budget.firstDay
-                            ).toLocaleDateString()}
-                        </span>
-                    </span>
-                </div>
+                            )}
+                            onInput={e =>
+                                this.setState({
+                                    budget: {
+                                        ...this.state.budget,
+                                        firstDay: (e.currentTarget as HTMLInputElement)
+                                            .value
+                                    }
+                                })
+                            }
+                        />
+                    </label>
+                </fieldset>
                 <fieldset class='flex one'>
                     <label>
                         <strong>

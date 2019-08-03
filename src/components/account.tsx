@@ -43,6 +43,7 @@ export default class AccountEdit extends preact.Component<Props, State> {
                 <h1>Edit Account</h1>
                 <fieldset class='flex one'>
                     <label>
+                        <span>Name</span>
                         <input
                             type='text'
                             placeholder='Name'
@@ -61,6 +62,7 @@ export default class AccountEdit extends preact.Component<Props, State> {
                 </fieldset>
                 <fieldset class='flex one'>
                     <label>
+                        <span>Balance</span>
                         <input
                             type='number'
                             placeholder='Balance'
