@@ -146,9 +146,9 @@ function BudgetInfo({
                         <td>Remaining</td>
                         <td>
                             <strong className={numberStyleClass}>
-                                {currentTotal}
+                                {currentTotal.toFixed(2)}
                             </strong>{' '}
-                            ({targetTotal})
+                            ({targetTotal.toFixed(2)})
                         </td>
                     </tr>
                 </tbody>
