@@ -71,6 +71,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
         const budget: Budget = {
             ...this.state.budget,
             startingBalance: this.state.budget.startingBalance,
+            // These should be start of day anyway
             firstDay: new Date(this.state.budget.firstDay).toJSON(),
             lastDay: new Date(this.state.budget.lastDay).toJSON()
         };
@@ -137,7 +138,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                 </fieldset>
                 <h2>Accounts</h2>
                 {Object.entries(this.props.accounts).map(([id, account]) => (
-                    <div className='flex one'>
+                    <div className='flex one' key={id}>
                         <label>
                             <input
                                 type='checkbox'

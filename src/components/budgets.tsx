@@ -15,13 +15,26 @@ export default (props: Props) => {
             new Date(a[1].lastDay).getTime() - new Date(b[1].lastDay).getTime()
     );
 
-    // TODO expired
+    const expired = budgets.filter(
+        ([_id, budget]) =>
+            new Date(budget.lastDay).getTime() + dayMs < new Date().getTime()
+    );
+
+    const pending = budgets.filter(
+        ([_id, budget]) =>
+            new Date(budget.firstDay).getTime() > new Date().getTime()
+    );
+
+    // Quadratic
+    const active = budgets.filter(
+        b => expired.every(b2 => b !== b2) && pending.every(b2 => b !== b2)
+    );
 
     return (
         <div className='budgets'>
             <h1>Budgets</h1>
             <div class='flex one'>
-                {Object.entries(props.budgets).map(([id, budget]) => (
+                {active.map(([id, budget]) => (
                     <BudgetInfo
                         key={id}
                         budgetId={parseInt(id)}
@@ -29,6 +42,16 @@ export default (props: Props) => {
                         accounts={props.accounts}
                     />
                 ))}
+                {pending.length === 0 ? (
+                    undefined
+                ) : (
+                    <Inactive label='Pending' budgets={pending} />
+                )}
+                {expired.length === 0 ? (
+                    undefined
+                ) : (
+                    <Inactive label='Expired' budgets={expired} />
+                )}
                 {Object.keys(props.accounts).length > 0 ? (
                     <button className='success' onClick={props.onAdd}>
                         Add
@@ -136,5 +159,45 @@ function BudgetInfo({
                 </a>
             </footer>
         </article>
+    );
+}
+
+function Inactive({
+    budgets,
+    label
+}: {
+    budgets: [string, Budget][];
+    label: string;
+}) {
+    return (
+        <div className='inactive'>
+            <h3>{label}:</h3>
+            {budgets.map(([id, budget]) => (
+                <article class='card' key={id}>
+                    <header>
+                        <h3>{budget.name}</h3>
+                    </header>
+                    <tbody>
+                        <tr>
+                            <td>First Day</td>
+                            <td>
+                                {new Date(budget.firstDay).toLocaleDateString()}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Last Day</td>
+                            <td>
+                                {new Date(budget.lastDay).toLocaleDateString()}
+                            </td>
+                        </tr>
+                    </tbody>
+                    <footer>
+                        <a className='button' href={`#budget/${id}`}>
+                            Edit
+                        </a>
+                    </footer>
+                </article>
+            ))}
+        </div>
     );
 }

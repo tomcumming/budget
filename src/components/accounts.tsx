@@ -11,7 +11,7 @@ export default (props: Props) => {
         <div className='accounts'>
             <h1>Accounts</h1>
             {Object.entries(props.accounts).map(([id, account]) => (
-                <div class='flex one'>
+                <div class='flex one' key={id}>
                     <a href={`#account/${id}`} className='button'>
                         {account.name} - {account.balance}
                     </a>
