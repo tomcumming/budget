@@ -7,14 +7,13 @@ export type Props = {
 }
 
 export default (props: Props) => {
-    console.log(props);
     return <div className="accounts">
+        <h1>Accounts</h1>
         {
             Object.entries(props.accounts).map(([id, account]) => <div class="flex one">
                 <a href={`#account/${id}`} className='button'>
                     {account.name} - {account.balance}
                 </a>
-
             </div>)
         }
         <div class="flex one">

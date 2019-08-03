@@ -2,6 +2,8 @@ import * as preact from 'preact';
 
 import Accounts from './accounts';
 import AccountEdit from './account';
+import Budgets from './budgets';
+import EditBudget from './budget';
 
 const localStorageKey = 'app-state';
 
@@ -10,9 +12,19 @@ export type Account = {
     balance: number;
 };
 
+export type Budget = {
+    name: string;
+    accounts: number[];
+    firstDay: string;
+    lastDay: string;
+    startingBalance: number;
+    targetBalance: number;
+}
+
 export type StoredState = {
     freshId: number;
-    accounts: { [id: number]: Account }
+    accounts: { [id: number]: Account };
+    budgets: { [id: number]: Budget };
 };
 
 const initialStoredState: StoredState = {
@@ -22,13 +34,15 @@ const initialStoredState: StoredState = {
             name: 'test account',
             balance: 123
         }
-    }
+    },
+    budgets: {}
 };
 
 export type Props = {};
 
 type Screen =
     | { type: 'view-budgets' }
+    | { type: 'edit-budget', id: number }
     | { type: 'view-accounts' }
     | { type: 'edit-account', id: number };
 
@@ -58,6 +72,12 @@ export default class App extends preact.Component<Props, State> {
 
         if(/^#budgets$/.test(hash)) {
             this.setState({ screen: { type: 'view-budgets' }});
+        } else if(/^#budget\/\d+$/.test(hash)) {
+            const match = /^#budget\/(\d+)$/.exec(hash) as RegExpExecArray;
+            this.setState({ screen: {
+                type: 'edit-budget',
+                id: parseInt(match[1])
+            }});
         } else if(/^#accounts$/.test(hash)) {
             this.setState({ screen: { type: 'view-accounts' }});
         } else if(/^#account\/\d+$/.test(hash)) {
@@ -106,6 +126,39 @@ export default class App extends preact.Component<Props, State> {
         }
     }
 
+    onSaveBudget = (budget: Budget) => {
+        if(this.state.screen.type === 'edit-budget') {
+            const storedState = {
+                ...this.state.storedState,
+                budgets: {
+                    ...this.state.storedState.budgets,
+                    [this.state.screen.id]: budget
+                }
+            };
+            updateStoredState(storedState);
+            this.setState({ storedState });
+            window.location.hash = '#budgets';
+        } else {
+            console.warn('Save budget on wrong screen');
+        }
+    }
+
+    onDeleteBudget = () => {
+        if(this.state.screen.type === 'edit-budget') {
+            const budgets = { ... this.state.storedState.budgets }
+            delete budgets[this.state.screen.id];
+            const storedState = {
+                ...this.state.storedState,
+                budgets
+            };
+            updateStoredState(storedState);
+            this.setState({ storedState });
+            window.location.hash = '#budgets';
+        } else {
+            console.warn('Delete budget on wrong screen');
+        }
+    }
+
     onAddAccount = () => {
         const id = this.state.storedState.freshId;
         this.setState({
@@ -115,6 +168,17 @@ export default class App extends preact.Component<Props, State> {
             }
         });
         window.location.hash = `#account/${id}`;
+    }
+
+    onAddBudget = () => {
+        const id = this.state.storedState.freshId;
+        this.setState({
+            storedState: {
+                ...this.state.storedState,
+                freshId: id + 1
+            }
+        });
+        window.location.hash = `#budget/${id}`;
     }
 
     componentDidMount() {
@@ -139,6 +203,18 @@ export default class App extends preact.Component<Props, State> {
                 initialAccount={this.state.storedState.accounts[this.state.screen.id]}
                 onSave={this.onSaveAccount}
                 onDelete={this.onDeleteAccount}
+                />;
+        } else if(this.state.screen.type === 'view-budgets') {
+            screen = <Budgets
+                budgets={this.state.storedState.budgets}
+                onAdd={this.onAddBudget}
+                />;
+        } else if(this.state.screen.type === 'edit-budget') {
+            screen = <EditBudget
+                initialBudget={this.state.storedState.budgets[this.state.screen.id]}
+                accounts={this.state.storedState.accounts}
+                onSave={this.onSaveBudget}
+                onDelete={this.onDeleteBudget}
                 />;
         }
 

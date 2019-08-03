@@ -34,6 +34,7 @@ export default class AccountEdit extends preact.Component<Props, State> {
 
     render() {
         return <div className="edit-account">
+            <h1>Edit Account</h1>
             <fieldset class="flex one">
                 <label>
                     <input
