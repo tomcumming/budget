@@ -6,7 +6,7 @@ export type Props = {
     accounts: { [id: number]: Account };
     onSave: (budget: Budget) => void;
     onDelete: () => void;
-}
+};
 
 const emptyBudget: (date: Date) => Budget = (date: Date) => ({
     name: '',
@@ -18,7 +18,7 @@ const emptyBudget: (date: Date) => Budget = (date: Date) => ({
 });
 
 type State = {
-    budget: Budget
+    budget: Budget;
 };
 
 export default class BudgetEdit extends preact.Component<Props, State> {
@@ -26,9 +26,10 @@ export default class BudgetEdit extends preact.Component<Props, State> {
         super(props);
 
         this.state = {
-            budget: props.initialBudget === undefined
-                ? emptyBudget(new Date())
-                : props.initialBudget
+            budget:
+                props.initialBudget === undefined
+                    ? emptyBudget(new Date())
+                    : props.initialBudget
         };
     }
 
@@ -44,11 +45,13 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                 accounts
             }
         });
-    }
+    };
 
     startingBalance(): number {
-        return this.state.budget.accounts
-            .reduce((p, c) => p + this.props.accounts[c].balance, 0);
+        return this.state.budget.accounts.reduce(
+            (p, c) => p + this.props.accounts[c].balance,
+            0
+        );
     }
 
     onClickSave = () => {
@@ -59,40 +62,44 @@ export default class BudgetEdit extends preact.Component<Props, State> {
         };
         debugger;
         this.props.onSave(budget);
-    }
+    };
 
     componentDidUpdate(prevProps: Props) {
         if (this.props.initialBudget !== prevProps.initialBudget) {
             this.setState({
-                budget: this.props.initialBudget === undefined
-                    ? emptyBudget(new Date())
-                    : this.props.initialBudget
-            })
+                budget:
+                    this.props.initialBudget === undefined
+                        ? emptyBudget(new Date())
+                        : this.props.initialBudget
+            });
         }
     }
 
     render() {
-        return <div className="edit-budget">
-            <h1>Edit Budget</h1>
-            <fieldset class="flex one">
-                <label>
-                    <input
-                        type="text"
-                        placeholder="Name"
-                        value={this.state.budget.name}
-                        onInput={e => this.setState({
-                            budget: {
-                                ...this.state.budget,
-                                name: (e.currentTarget as HTMLInputElement).value
+        return (
+            <div className='edit-budget'>
+                <h1>Edit Budget</h1>
+                <fieldset class='flex one'>
+                    <label>
+                        <input
+                            type='text'
+                            placeholder='Name'
+                            value={this.state.budget.name}
+                            onInput={e =>
+                                this.setState({
+                                    budget: {
+                                        ...this.state.budget,
+                                        name: (e.currentTarget as HTMLInputElement)
+                                            .value
+                                    }
+                                })
                             }
-                        })}
-                    />
-                </label>
-            </fieldset>
-            <h2>Accounts</h2>
-            {
-                Object.entries(this.props.accounts)
-                    .map(([id, account]) => <div className='flex one'>
+                        />
+                    </label>
+                </fieldset>
+                <h2>Accounts</h2>
+                {Object.entries(this.props.accounts).map(([id, account]) => (
+                    <div className='flex one'>
                         <label>
                             <input
                                 type='checkbox'
@@ -103,60 +110,75 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                             />
                             <span className='checkable'>{account.name}</span>
                         </label>
-                    </div>)
-            }
-            <div class="flex one">
-                <span>
-                    <strong>Starting Balance:</strong> {this.startingBalance().toFixed(2)}
-                </span>
-            </div>
-            <fieldset class="flex one">
-                <label>
-                    <strong><span>Target Balance:</span></strong>
-                    <input
-                        type="number"
-                        placeholder="Target Balance"
-                        value={this.state.budget.targetBalance}
-                        onInput={e => this.setState({
-                            budget: {
-                                ...this.state.budget,
-                                targetBalance: parseFloat((e.currentTarget as HTMLInputElement).value)
+                    </div>
+                ))}
+                <div class='flex one'>
+                    <span>
+                        <strong>Starting Balance:</strong>{' '}
+                        {this.startingBalance().toFixed(2)}
+                    </span>
+                </div>
+                <fieldset class='flex one'>
+                    <label>
+                        <strong>
+                            <span>Target Balance:</span>
+                        </strong>
+                        <input
+                            type='number'
+                            placeholder='Target Balance'
+                            value={this.state.budget.targetBalance}
+                            onInput={e =>
+                                this.setState({
+                                    budget: {
+                                        ...this.state.budget,
+                                        targetBalance: parseFloat(
+                                            (e.currentTarget as HTMLInputElement)
+                                                .value
+                                        )
+                                    }
+                                })
                             }
-                        })}
-                    />
-                </label>
-            </fieldset>
-            <div class="flex one">
-                <span>
-                    <strong>First day:</strong> {new Date(this.state.budget.firstDay).toLocaleDateString()}
-                </span>
-            </div>
-            <fieldset class="flex one">
-                <label>
-                    <strong><span>Last Day:</span></strong>
-                    <input
-                        type="date"
-                        placeholder="Last Day"
-                        value={this.state.budget.lastDay}
-                        onInput={e => this.setState({
-                            budget: {
-                                ...this.state.budget,
-                                lastDay: (e.currentTarget as HTMLInputElement).value
+                        />
+                    </label>
+                </fieldset>
+                <div class='flex one'>
+                    <span>
+                        <strong>First day:</strong>{' '}
+                        {new Date(
+                            this.state.budget.firstDay
+                        ).toLocaleDateString()}
+                    </span>
+                </div>
+                <fieldset class='flex one'>
+                    <label>
+                        <strong>
+                            <span>Last Day:</span>
+                        </strong>
+                        <input
+                            type='date'
+                            placeholder='Last Day'
+                            value={this.state.budget.lastDay}
+                            onInput={e =>
+                                this.setState({
+                                    budget: {
+                                        ...this.state.budget,
+                                        lastDay: (e.currentTarget as HTMLInputElement)
+                                            .value
+                                    }
+                                })
                             }
-                        })}
-                    />
-                </label>
-            </fieldset>
-            <div class="flex two">
-                <button
-                    className='success'
-                    onClick={this.onClickSave}
-                >Save</button>
-                <button
-                    className='error'
-                    onClick={this.props.onDelete}
-                >Delete</button>
+                        />
+                    </label>
+                </fieldset>
+                <div class='flex two'>
+                    <button className='success' onClick={this.onClickSave}>
+                        Save
+                    </button>
+                    <button className='error' onClick={this.props.onDelete}>
+                        Delete
+                    </button>
+                </div>
             </div>
-        </div>;
+        );
     }
 }

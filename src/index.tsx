@@ -5,10 +5,7 @@ import App from './components/app';
 function main() {
     const wrapperElement = document.getElementById('wrapper');
 
-    preact.render(
-        <App />,
-        wrapperElement as HTMLElement
-    );
+    preact.render(<App />, wrapperElement as HTMLElement);
 }
 
 main();
