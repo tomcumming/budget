@@ -1,10 +1,10 @@
 import * as preact from 'preact';
 import { startOfDay, dayMs } from '../date';
-import { Budget } from './app';
+import { Budget, Account } from './app';
 
 export type Props = {
     budgets: { [id: number]: Budget };
-    hasAccounts: boolean;
+    accounts: { [id: number]: Account };
     onAdd: () => void;
 };
 
@@ -26,9 +26,10 @@ export default (props: Props) => {
                         key={id}
                         budgetId={parseInt(id)}
                         budget={budget}
+                        accounts={props.accounts}
                     />
                 ))}
-                {props.hasAccounts ? (
+                {Object.keys(props.accounts).length > 0 ? (
                     <button className='success' onClick={props.onAdd}>
                         Add
                     </button>
@@ -46,8 +47,18 @@ export default (props: Props) => {
 
 function BudgetInfo({
     budgetId,
-    budget
-}: preact.Attributes & { budgetId: number; budget: Budget }) {
+    budget,
+    accounts
+}: preact.Attributes & {
+    budgetId: number;
+    budget: Budget;
+    accounts: { [id: number]: Account };
+}) {
+    const budgetAccounts = budget.accounts.map(id => accounts[id]);
+    const currentTotal =
+        budgetAccounts.reduce((p, c) => p + c.balance, 0) -
+        budget.targetBalance;
+
     const firstDate = new Date(budget.firstDay);
     const lastDate = new Date(budget.lastDay);
 
@@ -61,6 +72,18 @@ function BudgetInfo({
 
     const totalBudget = budget.startingBalance - budget.targetBalance;
     const initialPerDayBudget = totalBudget / lengthDays;
+    const currentPerDayBudget = currentTotal / daysLeft;
+
+    const remainingToday =
+        currentTotal - (totalBudget - initialPerDayBudget * currentDays);
+
+    const targetTotal =
+        budget.startingBalance -
+        budget.targetBalance -
+        initialPerDayBudget * currentDays;
+
+    const numberStyleClass =
+        initialPerDayBudget <= currentPerDayBudget ? 'positive' : 'negative';
 
     return (
         <article class='card'>
@@ -81,11 +104,29 @@ function BudgetInfo({
                     </tr>
                     <tr>
                         <td>Remaining Today</td>
-                        <td></td>
+                        <td>
+                            <strong className={numberStyleClass}>
+                                {remainingToday.toFixed()}
+                            </strong>
+                        </td>
                     </tr>
                     <tr>
                         <td>Per Day</td>
-                        <td>({initialPerDayBudget})</td>
+                        <td>
+                            <strong className={numberStyleClass}>
+                                {currentPerDayBudget.toFixed(2)}
+                            </strong>{' '}
+                            ({initialPerDayBudget.toFixed(2)})
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Balance</td>
+                        <td>
+                            <strong className={numberStyleClass}>
+                                {currentTotal}
+                            </strong>{' '}
+                            ({targetTotal})
+                        </td>
                     </tr>
                 </tbody>
             </table>

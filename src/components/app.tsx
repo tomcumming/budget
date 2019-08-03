@@ -216,9 +216,7 @@ export default class App extends preact.Component<Props, State> {
                 <Budgets
                     budgets={this.state.storedState.budgets}
                     onAdd={this.onAddBudget}
-                    hasAccounts={
-                        Object.keys(this.state.storedState.accounts).length > 0
-                    }
+                    accounts={this.state.storedState.accounts}
                 />
             );
         } else if (this.state.screen.type === 'edit-budget') {
