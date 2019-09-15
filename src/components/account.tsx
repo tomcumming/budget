@@ -8,7 +8,7 @@ export type Props = {
     onDelete: () => void;
 };
 
-export default function AccountEdit(props: Props) {
+function Account(props: Props) {
     const [account, setAccount] = React.useState<Account>(
         accountFromInitialAccount(props.initialAccount)
     );
@@ -96,6 +96,8 @@ export default function AccountEdit(props: Props) {
         </div>
     );
 }
+
+export default React.memo(Account);
 
 function accountFromInitialAccount(initialAccount?: Account): Account {
     return initialAccount === undefined

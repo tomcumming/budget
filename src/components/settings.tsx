@@ -7,7 +7,7 @@ export type Props = {
     setStoredState: (storedState: StoredState) => void;
 };
 
-export default function Settings(props: Props) {
+function Settings(props: Props) {
     const onFileInputChange = React.useCallback(
         (e: React.FormEvent) => {
             const input: HTMLInputElement = e.currentTarget as HTMLInputElement;
@@ -54,6 +54,8 @@ export default function Settings(props: Props) {
         </div>
     );
 }
+
+export default React.memo(Settings);
 
 function createDataString(storedState: StoredState) {
     const blob = new Blob([JSON.stringify(storedState, undefined, 2)], {

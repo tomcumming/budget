@@ -39,7 +39,7 @@ export const initialStoredState: StoredState = {
 
 export type Props = {};
 
-export default function App(props: Props) {
+function App(props: Props) {
     const [storedState, _setStoredState] = React.useState(loadStoredState());
     const screenRoute = useRoute();
 
@@ -144,6 +144,8 @@ export default function App(props: Props) {
         </div>
     );
 }
+
+export default React.memo(App);
 
 function Header(_props: {}) {
     return (

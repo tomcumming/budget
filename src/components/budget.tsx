@@ -9,7 +9,7 @@ export type Props = {
     onDelete: () => void;
 };
 
-export default function EditBudget(props: Props) {
+function Budget(props: Props) {
     const [budget, setBudget] = React.useState(
         budgetFromInitial(props.initialBudget)
     );
@@ -182,6 +182,8 @@ export default function EditBudget(props: Props) {
         </div>
     );
 }
+
+export default React.memo(Budget);
 
 function makeAccountToggles(
     accounts: Props['accounts'],

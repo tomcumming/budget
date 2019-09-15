@@ -8,7 +8,7 @@ export type Props = {
     onAdd: () => void;
 };
 
-export default (props: Props) => {
+function Budgets(props: Props) {
     const budgets = Object.entries(props.budgets);
     budgets.sort(
         (a, b) =>
@@ -66,7 +66,9 @@ export default (props: Props) => {
             </div>
         </div>
     );
-};
+}
+
+export default React.memo(Budgets);
 
 function BudgetInfo({
     budgetId,

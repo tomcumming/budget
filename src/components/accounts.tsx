@@ -6,7 +6,7 @@ export type Props = {
     onAdd: () => void;
 };
 
-export default (props: Props) => {
+function Accounts(props: Props) {
     return (
         <div className='accounts'>
             <h1>Accounts</h1>
@@ -24,4 +24,6 @@ export default (props: Props) => {
             </div>
         </div>
     );
-};
+}
+
+export default React.memo(Accounts);
