@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 import { Account } from './app';
 
 export type Props = {
@@ -6,22 +6,24 @@ export type Props = {
     onAdd: () => void;
 };
 
-export default (props: Props) => {
+function Accounts(props: Props) {
     return (
         <div className='accounts'>
             <h1>Accounts</h1>
             {Object.entries(props.accounts).map(([id, account]) => (
-                <div class='flex one' key={id}>
+                <div className='flex one' key={id}>
                     <a href={`#account/${id}`} className='button'>
                         {account.name} - {account.balance}
                     </a>
                 </div>
             ))}
-            <div class='flex one'>
+            <div className='flex one'>
                 <button className='success' onClick={props.onAdd}>
                     Add
                 </button>
             </div>
         </div>
     );
-};
+}
+
+export default React.memo(Accounts);

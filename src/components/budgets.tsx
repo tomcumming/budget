@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 import { startOfDay, dayMs } from '../date';
 import { Budget, Account } from './app';
 
@@ -8,7 +8,7 @@ export type Props = {
     onAdd: () => void;
 };
 
-export default (props: Props) => {
+function Budgets(props: Props) {
     const budgets = Object.entries(props.budgets);
     budgets.sort(
         (a, b) =>
@@ -33,7 +33,7 @@ export default (props: Props) => {
     return (
         <div className='budgets'>
             <h1>Budgets</h1>
-            <div class='flex one'>
+            <div className='flex one'>
                 {active.map(([id, budget]) => (
                     <BudgetInfo
                         key={id}
@@ -58,7 +58,7 @@ export default (props: Props) => {
                     </button>
                 ) : (
                     <h1>
-                        <span class='label warning'>
+                        <span className='label warning'>
                             You need to setup some accounts first
                         </span>
                     </h1>
@@ -66,13 +66,15 @@ export default (props: Props) => {
             </div>
         </div>
     );
-};
+}
+
+export default React.memo(Budgets);
 
 function BudgetInfo({
     budgetId,
     budget,
     accounts
-}: preact.Attributes & {
+}: React.Attributes & {
     budgetId: number;
     budget: Budget;
     accounts: { [id: number]: Account };
@@ -109,11 +111,11 @@ function BudgetInfo({
         initialPerDayBudget <= currentPerDayBudget ? 'positive' : 'negative';
 
     return (
-        <article class='card'>
+        <article className='card'>
             <header>
                 <h3>{budget.name}</h3>
             </header>
-            <table class='primary'>
+            <table className='primary'>
                 <tbody>
                     <tr>
                         <td>Last Day</td>
@@ -146,9 +148,9 @@ function BudgetInfo({
                         <td>Remaining</td>
                         <td>
                             <strong className={numberStyleClass}>
-                                {currentTotal}
+                                {currentTotal.toFixed(2)}
                             </strong>{' '}
-                            ({targetTotal})
+                            ({targetTotal.toFixed(2)})
                         </td>
                     </tr>
                 </tbody>
@@ -173,7 +175,7 @@ function Inactive({
         <div className='inactive'>
             <h3>{label}:</h3>
             {budgets.map(([id, budget]) => (
-                <article class='card' key={id}>
+                <article className='card' key={id}>
                     <header>
                         <h3>{budget.name}</h3>
                     </header>

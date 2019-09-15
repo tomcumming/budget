@@ -1,4 +1,7 @@
-import * as preact from 'preact';
+import * as React from 'react';
+
+import { Screen } from '../screen';
+import { useRoute } from '../hooks/route';
 
 import Accounts from './accounts';
 import AccountEdit from './account';
@@ -36,239 +39,113 @@ export const initialStoredState: StoredState = {
 
 export type Props = {};
 
-type Screen =
-    | { type: 'view-budgets' }
-    | { type: 'edit-budget'; id: number }
-    | { type: 'view-accounts' }
-    | { type: 'edit-account'; id: number }
-    | { type: 'settings' };
+function App(props: Props) {
+    const [storedState, _setStoredState] = React.useState(loadStoredState());
+    const screenRoute = useRoute();
 
-type State = {
-    storedState: StoredState;
-    screen: Screen;
-};
-
-function updateStoredState(storedState: StoredState): void {
-    window.localStorage.setItem(localStorageKey, JSON.stringify(storedState));
-}
-
-export default class App extends preact.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-
-        this.state = {
-            storedState:
-                window.localStorage.getItem(localStorageKey) === null
-                    ? initialStoredState
-                    : JSON.parse(window.localStorage.getItem(
-                          localStorageKey
-                      ) as string),
-            screen: { type: 'view-budgets' }
-        };
+    function updateStoredState(storedState: StoredState) {
+        window.localStorage.setItem(
+            localStorageKey,
+            JSON.stringify(storedState)
+        );
+        _setStoredState(storedState);
     }
 
-    handleRouteChange = (_e: HashChangeEvent) => {
-        const hash = window.location.hash;
+    const onAddAccount = React.useCallback(
+        makeOnAddAccount(storedState, updateStoredState),
+        [storedState]
+    );
 
-        if (/^#budgets$/.test(hash)) {
-            this.setState({ screen: { type: 'view-budgets' } });
-        } else if (/^#budget\/\d+$/.test(hash)) {
-            const match = /^#budget\/(\d+)$/.exec(hash) as RegExpExecArray;
-            this.setState({
-                screen: {
-                    type: 'edit-budget',
-                    id: parseInt(match[1])
-                }
-            });
-        } else if (/^#accounts$/.test(hash)) {
-            this.setState({ screen: { type: 'view-accounts' } });
-        } else if (/^#account\/\d+$/.test(hash)) {
-            const match = /^#account\/(\d+)$/.exec(hash) as RegExpExecArray;
-            this.setState({
-                screen: {
-                    type: 'edit-account',
-                    id: parseInt(match[1])
-                }
-            });
-        } else if (/^#settings$/.test(hash)) {
-            this.setState({
-                screen: {
-                    type: 'settings'
-                }
-            });
-        } else {
-            // default
-            console.warn('unmatched route', hash);
-            this.setState({ screen: { type: 'view-budgets' } });
-        }
-    };
+    const onSaveAccount = React.useCallback(
+        makeOnSaveAccount(screenRoute, storedState, updateStoredState),
+        [screenRoute, storedState]
+    );
 
-    onSaveAccount = (account: Account) => {
-        if (this.state.screen.type === 'edit-account') {
-            const storedState = {
-                ...this.state.storedState,
-                accounts: {
-                    ...this.state.storedState.accounts,
-                    [this.state.screen.id]: account
-                }
-            };
+    const onDeleteAccount = React.useCallback(
+        makeOnDeleteAccount(screenRoute, storedState, updateStoredState),
+        [screenRoute, storedState]
+    );
+
+    const onAddBudget = React.useCallback(
+        makeOnAddBudget(storedState, updateStoredState),
+        [storedState]
+    );
+
+    const onSaveBudget = React.useCallback(
+        makeOnSaveBudget(screenRoute, storedState, updateStoredState),
+        [screenRoute, storedState]
+    );
+
+    const onDeleteBudget = React.useCallback(
+        makeOnDeleteBudget(screenRoute, storedState, updateStoredState),
+        [screenRoute, storedState]
+    );
+
+    const onImportStoredState = React.useCallback(
+        (storedState: StoredState) => {
             updateStoredState(storedState);
-            this.setState({ storedState });
-            window.location.hash = '#accounts';
-        } else {
-            console.warn('Save account on wrong screen');
-        }
-    };
+            window.location.hash = `#accounts`;
+        },
+        []
+    );
 
-    onDeleteAccount = () => {
-        if (this.state.screen.type === 'edit-account') {
-            const accounts = { ...this.state.storedState.accounts };
-            delete accounts[this.state.screen.id];
-            const storedState = {
-                ...this.state.storedState,
-                accounts
-            };
-            updateStoredState(storedState);
-            this.setState({ storedState });
-            window.location.hash = '#accounts';
-        } else {
-            console.warn('Delete account on wrong screen');
-        }
-    };
+    let screen: undefined | JSX.Element;
 
-    onSaveBudget = (budget: Budget) => {
-        if (this.state.screen.type === 'edit-budget') {
-            const storedState = {
-                ...this.state.storedState,
-                budgets: {
-                    ...this.state.storedState.budgets,
-                    [this.state.screen.id]: budget
-                }
-            };
-            updateStoredState(storedState);
-            this.setState({ storedState });
-            window.location.hash = '#budgets';
-        } else {
-            console.warn('Save budget on wrong screen');
-        }
-    };
-
-    onDeleteBudget = () => {
-        if (this.state.screen.type === 'edit-budget') {
-            const budgets = { ...this.state.storedState.budgets };
-            delete budgets[this.state.screen.id];
-            const storedState = {
-                ...this.state.storedState,
-                budgets
-            };
-            updateStoredState(storedState);
-            this.setState({ storedState });
-            window.location.hash = '#budgets';
-        } else {
-            console.warn('Delete budget on wrong screen');
-        }
-    };
-
-    onAddAccount = () => {
-        const id = this.state.storedState.freshId;
-        this.setState({
-            storedState: {
-                ...this.state.storedState,
-                freshId: id + 1
-            }
-        });
-        window.location.hash = `#account/${id}`;
-    };
-
-    onAddBudget = () => {
-        const id = this.state.storedState.freshId;
-        this.setState({
-            storedState: {
-                ...this.state.storedState,
-                freshId: id + 1
-            }
-        });
-        window.location.hash = `#budget/${id}`;
-    };
-
-    onImportStoredState = (storedState: StoredState) => {
-        updateStoredState(storedState);
-        this.setState({ storedState });
-        window.location.hash = `#accounts`;
-    };
-
-    componentDidMount() {
-        window.addEventListener('hashchange', this.handleRouteChange);
-        this.handleRouteChange(undefined as any);
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('hashchange', this.handleRouteChange);
-    }
-
-    render(): JSX.Element {
-        let screen: preact.ComponentChild = null;
-        if (this.state.screen.type === 'view-accounts')
-            screen = (
-                <Accounts
-                    accounts={this.state.storedState.accounts}
-                    onAdd={this.onAddAccount}
-                />
-            );
-        else if (this.state.screen.type === 'edit-account') {
-            const accountId = this.state.screen.id;
-            const inUse =
-                Object.values(this.state.storedState.budgets).filter(b =>
-                    b.accounts.some(aId => aId === accountId)
-                ).length > 0;
-            screen = (
-                <AccountEdit
-                    initialAccount={this.state.storedState.accounts[accountId]}
-                    onSave={this.onSaveAccount}
-                    onDelete={this.onDeleteAccount}
-                    isInUse={inUse}
-                />
-            );
-        } else if (this.state.screen.type === 'view-budgets') {
-            screen = (
-                <Budgets
-                    budgets={this.state.storedState.budgets}
-                    onAdd={this.onAddBudget}
-                    accounts={this.state.storedState.accounts}
-                />
-            );
-        } else if (this.state.screen.type === 'edit-budget') {
-            screen = (
-                <EditBudget
-                    initialBudget={
-                        this.state.storedState.budgets[this.state.screen.id]
-                    }
-                    accounts={this.state.storedState.accounts}
-                    onSave={this.onSaveBudget}
-                    onDelete={this.onDeleteBudget}
-                />
-            );
-        } else if (this.state.screen.type === 'settings') {
-            screen = (
-                <Settings
-                    storedState={this.state.storedState}
-                    setStoredState={this.onImportStoredState}
-                />
-            );
-        }
-
-        return (
-            <div className='app'>
-                <Header />
-                <div
-                    style={{ paddingTop: '3em', width: '90%', margin: 'auto' }}
-                >
-                    {screen}
-                </div>
-            </div>
+    if (screenRoute.type === 'view-accounts')
+        screen = (
+            <Accounts accounts={storedState.accounts} onAdd={onAddAccount} />
+        );
+    else if (screenRoute.type === 'edit-account') {
+        const accountId = screenRoute.id;
+        const inUse =
+            Object.values(storedState.budgets).filter(b =>
+                b.accounts.some(aId => aId === accountId)
+            ).length > 0;
+        screen = (
+            <AccountEdit
+                initialAccount={storedState.accounts[accountId]}
+                onSave={onSaveAccount}
+                onDelete={onDeleteAccount}
+                isInUse={inUse}
+            />
+        );
+    } else if (screenRoute.type === 'view-budgets') {
+        screen = (
+            <Budgets
+                budgets={storedState.budgets}
+                onAdd={onAddBudget}
+                accounts={storedState.accounts}
+            />
+        );
+    } else if (screenRoute.type === 'edit-budget') {
+        screen = (
+            <EditBudget
+                initialBudget={storedState.budgets[screenRoute.id]}
+                accounts={storedState.accounts}
+                onSave={onSaveBudget}
+                onDelete={onDeleteBudget}
+            />
+        );
+    } else if (screenRoute.type === 'settings') {
+        screen = (
+            <Settings
+                storedState={storedState}
+                setStoredState={onImportStoredState}
+            />
         );
     }
+
+    return (
+        <div className='app'>
+            <Header />
+            <div style={{ paddingTop: '3em', width: '90%', margin: 'auto' }}>
+                {screen}
+            </div>
+        </div>
+    );
 }
+
+export default React.memo(App);
 
 function Header(_props: {}) {
     return (
@@ -286,4 +163,124 @@ function Header(_props: {}) {
             </div>
         </nav>
     );
+}
+
+function loadStoredState(): StoredState {
+    return window.localStorage.getItem(localStorageKey) === null
+        ? initialStoredState
+        : JSON.parse(window.localStorage.getItem(localStorageKey) as string);
+}
+
+function makeOnAddAccount(
+    storedState: StoredState,
+    setStoredState: (s: StoredState) => void
+): () => void {
+    return () => {
+        const id = storedState.freshId;
+        setStoredState({
+            ...storedState,
+            freshId: id + 1
+        });
+        window.location.hash = `#account/${id}`;
+    };
+}
+
+function makeOnSaveAccount(
+    screen: Screen,
+    oldStoredState: StoredState,
+    setStoredState: (s: StoredState) => void
+): (account: Account) => void {
+    return (account: Account) => {
+        if (screen.type === 'edit-account') {
+            const storedState = {
+                ...oldStoredState,
+                accounts: {
+                    ...oldStoredState.accounts,
+                    [screen.id]: account
+                }
+            };
+            setStoredState(storedState);
+            window.location.hash = '#accounts';
+        } else {
+            console.warn('Save account on wrong screen');
+        }
+    };
+}
+
+function makeOnDeleteAccount(
+    screen: Screen,
+    oldStoredState: StoredState,
+    setStoredState: (s: StoredState) => void
+): () => void {
+    return () => {
+        if (screen.type === 'edit-account') {
+            const accounts = { ...oldStoredState.accounts };
+            delete accounts[screen.id];
+            const storedState = {
+                ...oldStoredState,
+                accounts
+            };
+            setStoredState(storedState);
+            window.location.hash = '#accounts';
+        } else {
+            console.warn('Delete account on wrong screen');
+        }
+    };
+}
+
+function makeOnAddBudget(
+    oldStoredState: StoredState,
+    setStoredState: (s: StoredState) => void
+): () => void {
+    return () => {
+        const id = oldStoredState.freshId;
+        setStoredState({
+            ...oldStoredState,
+            freshId: id + 1
+        });
+        window.location.hash = `#budget/${id}`;
+    };
+}
+
+function makeOnSaveBudget(
+    screen: Screen,
+    oldStoredState: StoredState,
+    setStoredState: (s: StoredState) => void
+): (budget: Budget) => void {
+    return (budget: Budget) => {
+        if (screen.type === 'edit-budget') {
+            const storedState = {
+                ...oldStoredState,
+                budgets: {
+                    ...oldStoredState.budgets,
+                    [screen.id]: budget
+                }
+            };
+            setStoredState(storedState);
+            window.location.hash = '#budgets';
+        } else {
+            console.warn('Save budget on wrong screen');
+        }
+    };
+}
+
+function makeOnDeleteBudget(
+    screen: Screen,
+    oldStoredState: StoredState,
+    setStoredState: (s: StoredState) => void
+): () => void {
+    return () => {
+        if (screen.type === 'edit-budget') {
+            const budgets = { ...oldStoredState.budgets };
+            delete budgets[screen.id];
+            const storedState = {
+                ...oldStoredState,
+                budgets
+            };
+            setStoredState(storedState);
+            window.location.hash = '#budgets';
+        } else {
+            console.warn('Delete budget on wrong screen');
+        }
+    };
 }
