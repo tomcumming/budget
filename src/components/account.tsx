@@ -8,105 +8,97 @@ export type Props = {
     onDelete: () => void;
 };
 
-type State = {
-    account: Account;
-};
+export default function AccountEdit(props: Props) {
+    const [account, setAccount] = React.useState<Account>(
+        accountFromInitialAccount(props.initialAccount)
+    );
 
-export default class AccountEdit extends React.PureComponent<Props, State> {
-    constructor(props: Props) {
-        super(props);
+    React.useEffect(
+        () => setAccount(accountFromInitialAccount(props.initialAccount)),
+        [props.initialAccount]
+    );
 
-        this.state = {
-            account:
-                props.initialAccount === undefined
-                    ? { name: '', balance: 0 }
-                    : props.initialAccount
-        };
-    }
+    const onSetName = React.useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) =>
+            setAccount({
+                ...account,
+                name: (e.currentTarget as HTMLInputElement).value
+            }),
+        [account]
+    );
 
-    componentDidUpdate(prevProps: Props) {
-        if (this.props.initialAccount !== prevProps.initialAccount) {
-            this.setState({
-                account:
-                    this.props.initialAccount === undefined
-                        ? { name: '', balance: 0 }
-                        : this.props.initialAccount
-            });
-        }
-    }
+    const onSetBalance = React.useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) =>
+            setAccount({
+                ...account,
+                balance: parseFloat((e.currentTarget as HTMLInputElement).value)
+            }),
+        [account]
+    );
 
-    render() {
-        const invalidBalance = !Number.isFinite(this.state.account.balance);
+    const onClickSave = React.useCallback(() => props.onSave(account), [
+        props.onSave,
+        account
+    ]);
 
-        return (
-            <div className='edit-account'>
-                <h1>Edit Account</h1>
-                <fieldset className='flex one'>
-                    <label>
-                        <span>Name</span>
-                        <input
-                            type='text'
-                            placeholder='Name'
-                            value={this.state.account.name}
-                            onChange={e =>
-                                this.setState({
-                                    account: {
-                                        ...this.state.account,
-                                        name: (e.currentTarget as HTMLInputElement)
-                                            .value
-                                    }
-                                })
-                            }
-                        />
-                    </label>
-                </fieldset>
-                <fieldset className='flex one'>
-                    <label>
-                        <span>Balance</span>
-                        <input
-                            type='number'
-                            placeholder='Balance'
-                            value={this.state.account.balance}
-                            onChange={e =>
-                                this.setState({
-                                    account: {
-                                        ...this.state.account,
-                                        balance: parseFloat(
-                                            (e.currentTarget as HTMLInputElement)
-                                                .value
-                                        )
-                                    }
-                                })
-                            }
-                        />
-                    </label>
-                </fieldset>
-                {this.props.isInUse ? (
-                    <h1>
-                        <span className='label warning'>
-                            Can't delete; Used by a Budget
-                        </span>
-                    </h1>
-                ) : (
-                    undefined
-                )}
-                <div className='flex two'>
-                    <button
-                        className='success'
-                        onClick={() => this.props.onSave(this.state.account)}
-                        disabled={invalidBalance}
-                    >
-                        Save
-                    </button>
-                    <button
-                        className='error'
-                        onClick={this.props.onDelete}
-                        disabled={this.props.isInUse}
-                    >
-                        Delete
-                    </button>
-                </div>
+    const invalidBalance = !Number.isFinite(account.balance);
+
+    return (
+        <div className='edit-account'>
+            <h1>Edit Account</h1>
+            <fieldset className='flex one'>
+                <label>
+                    <span>Name</span>
+                    <input
+                        type='text'
+                        placeholder='Name'
+                        value={account.name}
+                        onChange={onSetName}
+                    />
+                </label>
+            </fieldset>
+            <fieldset className='flex one'>
+                <label>
+                    <span>Balance</span>
+                    <input
+                        type='number'
+                        placeholder='Balance'
+                        value={account.balance}
+                        onChange={onSetBalance}
+                    />
+                </label>
+            </fieldset>
+            {props.isInUse ? (
+                <h1>
+                    <span className='label warning'>
+                        Can't delete; Used by a Budget
+                    </span>
+                </h1>
+            ) : (
+                undefined
+            )}
+            <div className='flex two'>
+                <button
+                    className='success'
+                    onClick={onClickSave}
+                    disabled={invalidBalance}
+                >
+                    Save
+                </button>
+                <button
+                    className='error'
+                    onClick={props.onDelete}
+                    disabled={props.isInUse}
+                >
+                    Delete
+                </button>
             </div>
-        );
-    }
+        </div>
+    );
+}
+
+function accountFromInitialAccount(initialAccount?: Account): Account {
+    return initialAccount === undefined
+        ? { name: '', balance: 0 }
+        : initialAccount;
 }
