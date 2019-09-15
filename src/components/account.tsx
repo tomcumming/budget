@@ -48,7 +48,7 @@ export default class AccountEdit extends React.PureComponent<Props, State> {
                             type='text'
                             placeholder='Name'
                             value={this.state.account.name}
-                            onInput={e =>
+                            onChange={e =>
                                 this.setState({
                                     account: {
                                         ...this.state.account,
@@ -67,7 +67,7 @@ export default class AccountEdit extends React.PureComponent<Props, State> {
                             type='number'
                             placeholder='Balance'
                             value={this.state.account.balance}
-                            onInput={e =>
+                            onChange={e =>
                                 this.setState({
                                     account: {
                                         ...this.state.account,

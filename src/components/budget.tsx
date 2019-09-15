@@ -124,7 +124,7 @@ export default class BudgetEdit extends React.PureComponent<Props, State> {
                             type='text'
                             placeholder='Name'
                             value={this.state.budget.name}
-                            onInput={e =>
+                            onChange={e =>
                                 this.setState({
                                     budget: {
                                         ...this.state.budget,
@@ -160,7 +160,7 @@ export default class BudgetEdit extends React.PureComponent<Props, State> {
                             type='number'
                             placeholder='Target Balance'
                             value={this.state.budget.startingBalance}
-                            onInput={e =>
+                            onChange={e =>
                                 this.setState({
                                     budget: {
                                         ...this.state.budget,
@@ -183,7 +183,7 @@ export default class BudgetEdit extends React.PureComponent<Props, State> {
                             type='number'
                             placeholder='Target Balance'
                             value={this.state.budget.targetBalance}
-                            onInput={e =>
+                            onChange={e =>
                                 this.setState({
                                     budget: {
                                         ...this.state.budget,
@@ -208,7 +208,7 @@ export default class BudgetEdit extends React.PureComponent<Props, State> {
                             value={jsonDateAsInputValue(
                                 this.state.budget.firstDay
                             )}
-                            onInput={e =>
+                            onChange={e =>
                                 this.setState({
                                     budget: {
                                         ...this.state.budget,
@@ -231,7 +231,7 @@ export default class BudgetEdit extends React.PureComponent<Props, State> {
                             value={jsonDateAsInputValue(
                                 this.state.budget.lastDay
                             )}
-                            onInput={e =>
+                            onChange={e =>
                                 this.setState({
                                     budget: {
                                         ...this.state.budget,
