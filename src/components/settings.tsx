@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import { StoredState, initialStoredState } from './app';
 
@@ -9,7 +9,7 @@ export type Props = {
 
 type State = {};
 
-export default class Settings extends preact.Component<Props, State> {
+export default class Settings extends React.PureComponent<Props, State> {
     createDataString = () => {
         const blob = new Blob(
             [JSON.stringify(this.props.storedState, undefined, 2)],
@@ -21,7 +21,7 @@ export default class Settings extends preact.Component<Props, State> {
         return URL.createObjectURL(blob);
     };
 
-    onFileInputChange = (e: Event) => {
+    onFileInputChange = (e: React.FormEvent) => {
         const input: HTMLInputElement = e.currentTarget as HTMLInputElement;
         const file = input.files !== null ? input.files[0] : undefined;
         if (file !== undefined) {
@@ -44,7 +44,7 @@ export default class Settings extends preact.Component<Props, State> {
     render() {
         return (
             <div className='settings'>
-                <div class='flex one'>
+                <div className='flex one'>
                     <a
                         className='button'
                         href={this.createDataString()}

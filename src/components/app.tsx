@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 
 import Accounts from './accounts';
 import AccountEdit from './account';
@@ -52,7 +52,7 @@ function updateStoredState(storedState: StoredState): void {
     window.localStorage.setItem(localStorageKey, JSON.stringify(storedState));
 }
 
-export default class App extends preact.Component<Props, State> {
+export default class App extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
 
@@ -207,7 +207,8 @@ export default class App extends preact.Component<Props, State> {
     }
 
     render(): JSX.Element {
-        let screen: preact.ComponentChild = null;
+        let screen: null | React.ReactChild = null;
+
         if (this.state.screen.type === 'view-accounts')
             screen = (
                 <Accounts

@@ -4,8 +4,7 @@
         "target": "esnext",
         "module": "esnext",
         "moduleResolution": "node",
-        "jsx": "react",
-        "jsxFactory": "preact.h",
+        "jsx": "react"
     },
     "files": [
         "./src/index.tsx"

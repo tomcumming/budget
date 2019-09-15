@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 import { Account } from './app';
 
 export type Props = {
@@ -12,7 +12,7 @@ type State = {
     account: Account;
 };
 
-export default class AccountEdit extends preact.Component<Props, State> {
+export default class AccountEdit extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
 
@@ -41,7 +41,7 @@ export default class AccountEdit extends preact.Component<Props, State> {
         return (
             <div className='edit-account'>
                 <h1>Edit Account</h1>
-                <fieldset class='flex one'>
+                <fieldset className='flex one'>
                     <label>
                         <span>Name</span>
                         <input
@@ -60,7 +60,7 @@ export default class AccountEdit extends preact.Component<Props, State> {
                         />
                     </label>
                 </fieldset>
-                <fieldset class='flex one'>
+                <fieldset className='flex one'>
                     <label>
                         <span>Balance</span>
                         <input
@@ -83,14 +83,14 @@ export default class AccountEdit extends preact.Component<Props, State> {
                 </fieldset>
                 {this.props.isInUse ? (
                     <h1>
-                        <span class='label warning'>
+                        <span className='label warning'>
                             Can't delete; Used by a Budget
                         </span>
                     </h1>
                 ) : (
                     undefined
                 )}
-                <div class='flex two'>
+                <div className='flex two'>
                     <button
                         className='success'
                         onClick={() => this.props.onSave(this.state.account)}

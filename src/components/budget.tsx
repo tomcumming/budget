@@ -1,4 +1,4 @@
-import * as preact from 'preact';
+import * as React from 'react';
 import { Account, Budget } from './app';
 import { startOfDay } from '../date';
 
@@ -37,7 +37,7 @@ type State = {
     budget: Budget;
 };
 
-export default class BudgetEdit extends preact.Component<Props, State> {
+export default class BudgetEdit extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
 
@@ -117,7 +117,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
         return (
             <div className='edit-budget'>
                 <h1>Edit Budget</h1>
-                <fieldset class='flex one'>
+                <fieldset className='flex one'>
                     <label>
                         <span>Name</span>
                         <input
@@ -151,7 +151,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                         </label>
                     </div>
                 ))}
-                <fieldset class='flex one'>
+                <fieldset className='flex one'>
                     <label>
                         <strong>
                             <span>Starting Balance:</span>
@@ -174,7 +174,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                         />
                     </label>
                 </fieldset>
-                <fieldset class='flex one'>
+                <fieldset className='flex one'>
                     <label>
                         <strong>
                             <span>Target Balance:</span>
@@ -197,7 +197,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                         />
                     </label>
                 </fieldset>
-                <fieldset class='flex one'>
+                <fieldset className='flex one'>
                     <label>
                         <strong>
                             <span>First Day:</span>
@@ -220,7 +220,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                         />
                     </label>
                 </fieldset>
-                <fieldset class='flex one'>
+                <fieldset className='flex one'>
                     <label>
                         <strong>
                             <span>Last Day:</span>
@@ -252,7 +252,7 @@ export default class BudgetEdit extends preact.Component<Props, State> {
                 ) : (
                     undefined
                 )}
-                <div class='flex two'>
+                <div className='flex two'>
                     <button
                         className='success'
                         onClick={this.onClickSave}
